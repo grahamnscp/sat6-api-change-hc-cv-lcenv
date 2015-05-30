@@ -44,21 +44,21 @@ publish_new_cv_version () {
    ORG=$1
    CVNAME=$2
 
-   logmsg "Publishing new version for CV: [$CVNAME] for ORG: [$ORG].."
+   logmsg "   Publishing new version for CV: [$CVNAME] for ORG: [$ORG].."
 
    # Get Content View ID
-   logmsg "\_Obtaining Content View ID for CV [$CVNAME].."
+   logmsg "   \_Obtaining Content View ID for CV [$CVNAME].."
    CVID=`/usr/bin/hammer content-view list --organization "$ORG" --name "$CVNAME" \
      | /bin/grep "$CVNAME" \
      | /bin/awk 'BEGIN{FS="|"}{ print $1 }' \
      | /bin/sed -e 's/^ *//' -e 's/ *$//'`
 
    #Publish new version to Library
-   logmsg "\_Publishing new version of Content View [$CVNAME], CVID [$CVID].."
+   logmsg "   \_Publishing new version of Content View [$CVNAME], CVID [$CVID].."
    PUBVER_OUT=`/usr/bin/hammer content-view publish --organization "$ORG" --name "$CVNAME" --id $CVID --async`
 
    PUBVER_TASK=`echo $PUBVER_OUT | awk '{ print $8 }'`
-   logmsg "\__Waiting for Publish Task: [$PUBVER_TASK] to complete.."
+   logmsg "   \__Waiting for Publish Task: [$PUBVER_TASK] to complete.."
    /usr/bin/hammer task progress --id $PUBVER_TASK
 
 }
@@ -69,25 +69,25 @@ promote_cv () {
    LCENV=$2
    CVNAME=$3
 
-   logmsg "Promoting CV: [$CVNAME] into LC ENV: [$LCENV] for ORG: [$ORG].."
+   logmsg "   Promoting CV: [$CVNAME] into LC ENV: [$LCENV] for ORG: [$ORG].."
 
    # Get Lifecycle Environment ID
-   logmsg "\_Obtaining Lifecycle Environment ID for LCE [$LCENV].."
+   logmsg "   \_Obtaining Lifecycle Environment ID for LCE [$LCENV].."
    LCENVID=`/usr/bin/hammer lifecycle-environment list --organization "$ORG" | /bin/awk 'BEGIN{FS="|"}{ print $1,$2 }' | /bin/grep "$LCENV" | /bin/awk '{print $1}' | /bin/sed -e 's/^ *//' -e 's/ *$//'`
 
    # Get Content View Latest Version
-   logmsg "\_Obtaining Latest Content View [$CVNAME] Version.."
+   logmsg "   \_Obtaining Latest Content View [$CVNAME] Version.."
    CVVERID=`/usr/bin/hammer content-view info --name "${CVNAME}" --organization "${ORG}" | /bin/grep "ID:" | /usr/bin/tail -1 | tr -d ' ' | cut -f2 -d ':'`
 
    # Promote the new Content View Version to the Lifecycle Environment
-   logmsg "\_Promoting latest Content View [$CVNAME] with Version [$CVVERID] to Lifecycle Environment [$LCENV] with LCE ID [$LCENVID].."
+   logmsg "   \_Promoting latest Content View [$CVNAME] with Version [$CVVERID] to Lifecycle Environment [$LCENV] with LCE ID [$LCENVID].."
    PUBPRO_OUT=`/usr/bin/hammer content-view version promote --content-view "${CVNAME}" --organization "${ORG}" --lifecycle-environment-id $LCENVID --id $CVVERID --async`
 
    PUBPRO_TASK=`echo $PUBPRO_OUT | awk '{ print $8 }'`
-   logmsg "\__Waiting for Publish Task: [$PUBPRO_TASK] to complete.."
+   logmsg "   \__Waiting for Publish Task: [$PUBPRO_TASK] to complete.."
    /usr/bin/hammer task progress --id $PUBPRO_TASK
 
-   logmsg "\_Complete."
+   logmsg "   \_Complete."
 }
 
 
